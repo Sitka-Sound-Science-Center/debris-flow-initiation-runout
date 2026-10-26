@@ -1,2 +1,2 @@
 # debris-flow-initiation-runout
-A framework for modeling the spatial distribution of colluvium depth, shallow landslide initiation, and debris flow inundation (i.e., runout) in soil-mantled landscapes.
+A framework for modeling the spatial distribution of colluvium depth, shallow landslide initiation, and debris flow inundation (i.e., runout). This framework was originally developed for use on Prince of Wales Island, Southeast Alaska, with the intention of using throughout Southeast Alaska, but may be applicable to other soil-mantled landscapes susceptible to debris flows.
