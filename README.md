@@ -1,2 +1,76 @@
 # debris-flow-initiation-runout
-A framework for modeling the spatial distribution of colluvium depth, shallow landslide initiation, and debris flow inundation (i.e., runout). This framework was originally developed for use on Prince of Wales Island, Southeast Alaska, with the intention of using throughout Southeast Alaska, but may be applicable to other soil-mantled landscapes susceptible to debris flows.
+A framework for modeling the spatial distribution of colluvium depth, shallow landslide initiation, and debris flow inundation (i.e., runout). This framework was originally developed for use on Prince of Wales Island, Southeast Alaska, and is intended for use throughout Southeast Alaska, but may be applicable to other soil-mantled landscapes susceptible to debris flows.
+
+## Overview
+The workflow herein (1) defines distributions of colluvium depth and hydrostatic pore pressure throughout a digital elevation model, (2) identifies unstable cells using a slope stability and clusters those cells into discrete shallow landslides with an associated volume, (3) constructs receiver operating characterisitc (ROC) curves with associated area under the curve (AUC) to quantify the performance of the model, (4) translates failure locations and volumes into initiation points for use within Grfin Tools, a USGS-developed landslide runout model.
+
+Grfin Tools may be downloaded separately and run using the aforementioned initiation points and configuration files included in this repository. This README desrcibes a workflow to run multiple Grfin Tools simulations and then calibrate those outputs to inventoried landslides. The result is a composite map of runout in which debris-flow mobility reflects the characteristics of landslides within each individual watershed within the landscape.
+
+This repository also includes code used to compare entrainment defined by an empirical volumetric bulking factor to entrainment defined by modeled colluvium depth (background on this analysis can be found in the discussion section of the associated publication).
+
+## Repository Structure
+**scripts:** Main codes used for initiation, initiation validation, and runout calibration analyses.  
+**functions:** Supporting functions for codes in the "scripts" folder.  
+**data:** Supporting data for the analyses described in the associated publication, excluding geospatial data.  
+**geospatial:** Geospatial data supporting analyses (e.g., rasters, shapefiles). Note that larger geospatial files may be downloaded from the Zenodo repository at https://doi.org/10.5281/zenodo.23681876, in the "geospatial_data" folder.  
+**config:** Configurations for running Grfin Tools, in YAML format.  
+**outputs:** Output files from analyses.
+
+## Requirements
+Software requirements include MATLAB and Grfin Tools. Analyses were performed using verion R2025b of MATLAB, but may earlier versions will likely work. We used Grfin Tools v1.0 for all analyses herein.
+
+Geospatial inputs were prepared using QGIS 4.0.1, but other geospatial platforms are likely to work.
+
+## Citations and Associated Work
+If you use this framework, please also cite the associated paper in addition to the Zenodo repository listed below:
+
+*Placeholder for Mathews et al. (2026), currently under review at Natural Hazards and Earth Systems Science:*
+Mathews, N. W., Roering, J. J., Johnson, A. C., Silva, L., McKay, S., & Bell, L. E. (In Review). Coupling modeled colluvium depth, landslide initiation, and debris-flow runout to map regional-scale inundation susceptibility. Natural Hazards and Earth System Sciences.
+
+Mathews, N. W., & Roering, J. J. (2026). Code, data, and susceptibility maps for coupled landslide initiation and debris-flow runout modeling, Prince of Wales Island, Alaska (Version 1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.23681876
+
+## Workflow
+### 1. Prepare Input Files
+1) Clone this repository to your local hard drive.
+Examples of necessary tables and supporting files (excluding geospatial inputs) are included in "data" folder.  
+2) These files may be modified to reflect local conditions or options in the "initiaion" script may be used to prevent using these files.  
+3) Copy files from the "POW2026_geospatial.zip" file in the Zenodo repository to the "geospatial" folder in the cloned repository on your local drive.
+4) Copy all folders from "POW2026_runout_simulations.zip" file in the Zenodo repository to the "grfin_setup\POW2026_runout\" folder in the cloned repository on your local drive.
+
+### 2. Shallow Landslide Susceptibility and Initiation
+1) Open "initiaion.m" in "scripts" folder.  
+2) Define desired settings.  
+3) Colluvium depth is calculated using a function embedded in this script. The code checks to see if an existing raster of soil depth exists for the given DEM. If it doesn't, one will be created (note: this can take 8+ hours for large rasters). A .mat file containing a soil depth distribution for the included DEM is included in the Zenodo repository.  
+4) If appropriate options are selected, this script will output: (1) a binary raster of landslide clusters, (2) a raster of factor of safety, and (c) a CSV table of initiation locations and associated volumes for use witih Grfin Tools (saved to \debris-flow-initiation-runout\grfin_setup\inundation_points\).
+
+### 3. Model Validation
+1) Open "validation_ROC_AUC.m" in "scripts" folder.  
+2) Ensure that all variables generated by "initiation.m" are still open in the MATLAB workspace. This script will generate ROC curves and AUC values based on active variables in the current workspace.
+3) Run script to generate ROC curves and AUC values.
+
+### 4. Development of Debris-Flow Inundation Rasters
+* NOTE: User will need to install Grfin Tools before continuing. Instructions can be found here: https://code.usgs.gov/grfintools/grfintools
+* NOTE: This guide describes steps necessary to develop a raster of debris-flow inundation for a single scenario. Note that if using the growth function, Grfin Tools v1.0 will generate debris flows at any growth zones, regardless of where initiation points are defined. A workaround is described in the associated paper cited above.  
+
+1) Open a YAML configuration file in the "grfin_setup" folder. An example for the DEM included in the Zenodo repository is included and named "POW2026.yaml".
+2) By default, the YAML file is set up to run inundation with growth, where initiation locations are defined by the custom growth zones included in the "geospatial" folder. Note that the inundation points are only considered if growth is off. Thus, the user must first run exaggerated mobility parameters with these points and "growth" set to "off" to develop custom growth zones, as described in the associated paper cited above. Here, the growth zones have already been computed and are included in the "geospatial" folder.  
+3) To use inventoried landslides to calibrate entrainment parameters, the user must develop a full suite of inundation rasters spanning all desired volumetric growth factors and transition angles. For the calibration stage, these debris flows must initiate at inventoried landslide locations. To develop these inundation rasters, the user must change the YAML script and re-run Grfin Tools for each scenario (iterating through growth factor and threshold slope). To change threshold slope, change the growth zone raster for the "growth_zone_raster" option. To change growth rate, change the "length_growth_factor" option. The provided scenarios corresponding with inventory initiation contain "BXx007" in their name, indicating that their initiation volumes are equal to 7% of volumes calculated using the area-volume relationships from Haida Gwaii (see associated paper for details).  
+4) A separate set of inundation rasters must be developed for all growth factors and transition slopes for creating a compound inundation map (forward mdoeling) where all watersheds reflect locally calibrated entrainment parameters. For this set of inundation rasters, debris flows should initiate at modeled initiation points determined using the initiation framework. The provided scenarios corresponding with modeled initiation points contain "BXx007" in their name, indicating that their initiation volumes are equal to 7% of volumes calculated using the area-volume relationships from Haida Gwaii (see associated paper for details).  
+5) All scenario outputs are provided for this DEM in the Zenodo repository (POW2026_runout_simulations.zip). Folders tied to each model run should be placed in the "grfin_setup" folder prior to proceeding to the next step.
+
+### 5. Calibration of Entrainment Parameters to Capture Variable Runout Mobility and Creation of Modeled Runout Rasters
+
+1) Open "runout_calibration_against_inventory_and_build_model_maps.m" in the "scripts" folder.
+2) Define folder within "grfin_setup" that contains simulations for study area. For the example herein, that folder is called "POW2026_runout".
+3) Run model. The outputs are saved in "outputs\calibrated_runout" and will consist of four rasters. For the study area "POW2026," the rasters will be named as follows:  
+   a) POW2026_optimized_runout: this is a runout simulation corresponding with inventoried landslide initiation points. Debris flow inundation reflects both the optimized growth factor and transition slope in each watershed.  
+   b) POW2026_optimized_runout_growth: this is a runout simulation corresponding with inventoried landslide initiation points. Debris flow inundation reflects the optimized transition slope in each watershed, but a range of inundation defined by variable growth factor is considered. Raster values (5,10,15,20,25,30) represent inundation corresponding to different growth factors.  
+   c) POW2026_model_optimized_runout: this is a runout simulation corresponding with modeled landslide initiation points, as defined by the initiation model. Debris flow inundation reflects both the optimized growth factor and transition slope in each watershed.  
+   d) POW2026_model_optimized_runout_growth: this is a runout simulation corresponding with modeled landslide initiation points, as defined by the initiation model. Debris flow inundation reflects the optimized transition slope in each watershed, but a range of inundation defined by variable growth factor is considered. Raster values (5,10,15,20,25,30) represent inundation corresponding to different growth factors.
+4) The resulting rasters can be imported into a GIS to examine inundation and create inundation susceptibility maps.
+
+
+
+
+
+

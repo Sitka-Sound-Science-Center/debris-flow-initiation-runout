@@ -1,0 +1,37 @@
+setup:
+  title: Unified POW raster
+  demfilename: C:\Users\NicolasMathews\OneDrive - Sitka Sound Science Center\Research\Projects\2025_seak_initiation_runout\analysis\geospatial\DEM\POW2026_5m.tif
+  num_procs: 16     # number of cores to use
+  compute_taudem_grids: if_absent
+  dest_dir: POW_model_a1_011_a2_08_slope20_growth10
+
+# -- Analysis Options -- #
+
+options:
+  inundation: yes
+  growth: yes
+  hl: no
+
+  # -- Inundation -- #
+
+inundation_options:
+  flowtype: custom
+  xsec_alpha1: 0.11
+  plan_alpha2: 8
+  hbar: yes
+  # user_specified_volumes_file: inundation_points\POW2026_5m_soil_series_strength_4.9kparoots_divide0.07_150percent.csv
+  output_img: POW_model_a1_011_a2_08_slope20_growth10.tif
+
+# -- Growth -- #
+
+growth_options:
+  growth_zones:
+    growth_zone_raster: "C:\code\debris-flow-initiation-runout\geospatial\POW2026_growth_zones_slope20.tif"
+    # include_partial: yes
+    # min_stream_slope: 5
+    # slope_method: downstream
+  growth_volumes:
+    point_source_volumes_file: initiation_points\POW2026_5m_soil_series_strength_4.9kparoots.csv
+    #max_volume: 9999999
+    length_growth:
+      length_growth_factor: 10
