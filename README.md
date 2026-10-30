@@ -24,8 +24,7 @@ Geospatial inputs were prepared using QGIS 4.0.1, but other geospatial platforms
 ## Citations and Associated Work
 If you use this framework, please also cite the associated paper in addition to the Zenodo repository listed below:
 
-*Placeholder for Mathews et al. (2026), currently under review at Natural Hazards and Earth Systems Science:*
-Mathews, N. W., Roering, J. J., Johnson, A. C., Silva, L., McKay, S., & Bell, L. E. (In Review). Coupling modeled colluvium depth, landslide initiation, and debris-flow runout to map regional-scale inundation susceptibility. Natural Hazards and Earth System Sciences.
+Mathews, N. W., Roering, J. J., Johnson, A. C., Silva, L., McKay, S., & Bell, L. E. (In Review, NHESS). Coupling modeled colluvium depth, landslide initiation, and debris-flow runout to map regional-scale inundation susceptibility. Natural Hazards and Earth System Sciences.
 
 Mathews, N. W., & Roering, J. J. (2026). Code, data, and susceptibility maps for coupled landslide initiation and debris-flow runout modeling, Prince of Wales Island, Alaska (Version 1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.23681876
 
